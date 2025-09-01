@@ -18,9 +18,9 @@ return {
         callback = function()
           local opts = { buffer = true, silent = true, noremap = true }
           vim.keymap.set('n', '<leader>lc', '<cmd>VimtexCompile<CR>', opts) -- compile/watch
-          vim.keymap.set('n', '<leader>lv', '<cmd>VimtexView<CR>', opts) -- view PDF
-          vim.keymap.set('n', '<leader>lk', '<cmd>VimtexStop<CR>', opts) -- stop compiler
-          vim.keymap.set('n', '<leader>le', '<cmd>VimtexErrors<CR>', opts) -- error list
+          vim.keymap.set('n', '<leader>lv', '<cmd>VimtexView<CR>', opts)    -- view PDF
+          vim.keymap.set('n', '<leader>lk', '<cmd>VimtexStop<CR>', opts)    -- stop compiler
+          vim.keymap.set('n', '<leader>le', '<cmd>VimtexErrors<CR>', opts)  -- error list
         end,
       })
     end,

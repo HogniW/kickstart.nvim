@@ -7,7 +7,7 @@ return {
       -- optional: force a browser
       -- vim.g.mkdp_browser = "/usr/bin/chromium-browser" -- or "/usr/bin/firefox"
       vim.g.mkdp_filetypes = { 'markdown', 'rmd' }
-      vim.g.mkdp_theme = 'light'
+      vim.g.mkdp_theme = 'dark'
       vim.g.mkdp_auto_start = 0
       vim.g.mkdp_auto_close = 1
       vim.g.mkdp_refresh_slow = 0
