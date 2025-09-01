@@ -7,34 +7,44 @@ return {
 
     conform.setup {
       formatters_by_ft = {
-        tex = { 'latexindent' },
-        plaintex = { 'latexindent' },
-        bib = { 'latexindent' },
+        tex = { 'latexindent_silent' },
+        plaintex = { 'latexindent_silent' },
+        bib = { 'latexindent_silent' },
       },
-      formatters = {
-        latexindent = {
-          command = 'latexindent',
-          -- -w: write in-place (needed when stdin=false)
-          -- -m: enable modifyLineBreaks (silences your CLI warning)
-          -- -l: load local/project settings + triggers indentconfig chain
-          -- set a real logfile so you can debug from nvim; change back to /dev/null after
-          args = { '-w', '-m', '-l', '--logfile=indent.log' },
-          stdin = false,
-        },
-      },
-      -- Always format on save for TeX-like files
+      -- if you only format after compile success, keep nil for TeX here
       format_on_save = function(bufnr)
         local ft = vim.bo[bufnr].filetype
         if ft == 'tex' or ft == 'plaintex' or ft == 'bib' then
-          return { timeout_ms = 3000, lsp_fallback = false }
+          return nil
         end
       end,
-      notify_on_error = true,
+      formatters = {
+        latexindent_silent = {
+          command = 'latexindent',
+          args = function(_)
+            -- robustly get absolute path of the current buffer
+            local bufnr = vim.api.nvim_get_current_buf()
+            local fname = vim.api.nvim_buf_get_name(bufnr)
+            if fname == '' then
+              fname = vim.fn.expand '%:p'
+            end
+            -- write-in-place, enable modifyLineBreaks, load local configs; silence logs
+            return { '-w', '-m', '-l', '--logfile=/dev/null', fname }
+          end,
+          stdin = false,
+          ignore_stderr = true, -- silence perl warnings
+          exit_codes = { 0 },
+        },
+      },
     }
 
-    -- Manual format key (normal/visual): <leader>lf
+    -- manual format: write → format → reload
     vim.keymap.set({ 'n', 'v' }, '<leader>lf', function()
-      conform.format { async = false, lsp_fallback = true }
+      if vim.bo.modified then
+        vim.cmd.write()
+      end
+      require('conform').format { async = false, lsp_fallback = false }
+      vim.cmd 'checktime'
     end, { desc = 'LaTeX [F]ormat file' })
   end,
 }
