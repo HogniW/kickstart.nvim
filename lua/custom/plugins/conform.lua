@@ -18,21 +18,32 @@ return {
           return nil
         end
       end,
+
       formatters = {
         latexindent_silent = {
           command = 'latexindent',
-          args = function(_)
-            -- robustly get absolute path of the current buffer
+          args = function()
             local bufnr = vim.api.nvim_get_current_buf()
             local fname = vim.api.nvim_buf_get_name(bufnr)
             if fname == '' then
               fname = vim.fn.expand '%:p'
             end
-            -- write-in-place, enable modifyLineBreaks, load local configs; silence logs
-            return { '-w', '-m', '-l', '--logfile=/dev/null', fname }
+
+            return {
+              '-w',                        -- write in-place
+              '-m',                        -- enable modifyLineBreaks
+              '-l',                        -- load local/home configs (still fine)
+              '--logfile=/dev/null',       -- no indent.log
+              -- --- Inline YAML overrides (apply every run) ---
+              '-y=defaultIndent: "  "',    -- two spaces
+              '-y=onlyOneBackUp: 1',       -- keep a single backup
+              '-y=maxNumberOfBackUps: 1',  -- (belt & suspenders)
+              '-y=cycleThroughBackUps: 0', -- don't rotate
+              fname,
+            }
           end,
           stdin = false,
-          ignore_stderr = true, -- silence perl warnings
+          ignore_stderr = true, -- hide perl warnings on stderr
           exit_codes = { 0 },
         },
       },
